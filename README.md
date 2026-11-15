@@ -38,8 +38,8 @@ METAR KHIO 150853Z AUTO 15010KT 10SM -RA BKN055 BKN075 OVC095 12/09 A2966 RMK AO
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/<your-username>/<your-repo>.git
-   cd <your-repo>
+   git clone https://github.com/milandukovski/metar-reader.git
+   cd metar-reader
    ```
 
 2. Create and activate a virtual environment:
