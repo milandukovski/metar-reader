@@ -123,6 +123,22 @@ print(report["summary"])
 # Light rain, overcast, 54°F (12°C). Wind from the south-southeast at 12 mph. Visibility 10 miles or more.
 ```
 
+## Running the tests
+
+The test suite uses [pytest](https://docs.pytest.org/). It feeds mock METAR
+readings to the decoder and replaces the weather service with a mock, so it
+needs no internet connection.
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+| File | What it covers |
+| --- | --- |
+| `tests/test_metar_decoder.py` | Mock METAR readings are turned into the right English |
+| `tests/test_app.py` | Fetching, code validation, and the web page, with the service mocked |
+
 ## Limitations
 
 - The remarks section (everything after `RMK`) is not translated, apart from
