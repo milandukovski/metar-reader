@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>METAR Reader{% if report %} · {{ report.station }}{% endif %}</title>
+  <style>
+    :root {
+      --bg: #f2f5f9; --card: #ffffff; --text: #17212e; --muted: #5d6b7c;
+      --line: #dfe5ec; --accent: #1764c0; --accent-text: #ffffff;
+      --error-bg: #fdecec; --error-text: #9b1c1c;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10161d; --card: #1a222c; --text: #e7edf4; --muted: #94a3b5;
+        --line: #2b3643; --accent: #5aa2f2; --accent-text: #0b1118;
+        --error-bg: #3a1c1c; --error-text: #f5b5b5;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 48px 16px; background: var(--bg); color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { margin: 0 0 4px; font-size: 1.75rem; }
+    .lead { margin: 0 0 24px; color: var(--muted); }
+    form { display: flex; gap: 8px; margin-bottom: 24px; }
+    input {
+      flex: 1; min-width: 0; padding: 12px 14px; font: inherit; font-size: 1.1rem;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--text); background: var(--card);
+      border: 1px solid var(--line); border-radius: 10px;
+    }
+    input::placeholder { text-transform: none; letter-spacing: 0; color: var(--muted); }
+    input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button {
+      padding: 12px 20px; font: inherit; font-weight: 600; cursor: pointer;
+      color: var(--accent-text); background: var(--accent);
+      border: 0; border-radius: 10px;
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 14px; padding: 24px;
+    }
+    .error { background: var(--error-bg); color: var(--error-text); border-color: transparent; }
+    .station { margin: 0; font-size: .85rem; font-weight: 600; letter-spacing: .08em; color: var(--accent); }
+    h2 { margin: 2px 0 0; font-size: 1.25rem; }
+    .observed { margin: 2px 0 0; font-size: .9rem; color: var(--muted); }
+    .summary { margin: 20px 0; font-size: 1.3rem; line-height: 1.45; }
+    dl { margin: 0; border-top: 1px solid var(--line); }
+    dl div { display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    dt { flex: 0 0 110px; color: var(--muted); }
+    dd { margin: 0; }
+    .raw-label { margin: 20px 0 6px; font-size: .85rem; color: var(--muted); }
+    pre {
+      margin: 0; padding: 12px; white-space: pre-wrap; word-break: break-word;
+      font: .85rem/1.5 ui-monospace, Consolas, monospace;
+      background: var(--bg); border-radius: 8px;
+    }
+    footer { margin-top: 20px; font-size: .85rem; color: var(--muted); text-align: center; }
+    footer a { color: inherit; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>METAR Reader</h1>
+    <p class="lead">Type an airport code to get its current weather in plain English.</p>
+
+    <form method="get" action="{{ url_for('index') }}">
+      <input name="airport" value="{{ code }}" placeholder="Airport code, e.g. KHIO"
+             aria-label="Airport code" maxlength="4" autocomplete="off"
+             autocapitalize="characters" spellcheck="false" required autofocus>
+      <button type="submit">Get weather</button>
+    </form>
+
+    {% if error %}
+      <div class="card error" role="alert">{{ error }}</div>
+    {% elif report %}
+      <article class="card">
+        <p class="station">{{ report.station }}</p>
+        {% if report.name %}<h2>{{ report.name }}</h2>{% endif %}
+        {% if report.observed_text %}<p class="observed">Observed {{ report.observed_text }}</p>{% endif %}
+
+        <p class="summary">{{ report.summary }}</p>
+
+        {% if report.details %}
+        <dl>
+          {% for item in report.details %}
+          <div><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
+          {% endfor %}
+        </dl>
+        {% endif %}
+
+        <p class="raw-label">Original METAR</p>
+        <pre>{{ report.raw }}</pre>
+      </article>
+    {% endif %}
+
+    <footer>Data from <a href="https://aviationweather.gov/">aviationweather.gov</a></footer>
+  </main>
+</body>
+</html>
